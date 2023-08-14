@@ -33,42 +33,49 @@ while (respondido <= 20)
     MostrarQuestao(nivel_atual);
     bool acertou = ResponderQuestao();
     certas[respondido] = acertou;
-    if (acertou)
+    try
     {
-        if (nivel_atual == 5)
+        if (acertou)
         {
-            TerminarTeste();
-            break;
-        }
-        else if ((nivel_anterior == nivel_atual && certas[respondido - 1] && certas[respondido - 2]) || (nivel_anterior != nivel_atual && certas[respondido - 1]))
-        {
-            nivel_anterior = nivel_atual;
-            nivel_atual++;
-        }
-        else
-        {
-            nivel_anterior = nivel_atual;
-        }
-    }
-    else
-    {
-        if ((nivel_atual == 5) || (nivel_anterior == nivel_atual && !certas[respondido - 1]) || (nivel_anterior != nivel_atual))
-        {
-            if (nivel_atual == 1)
+            if (nivel_atual == 5)
             {
                 TerminarTeste();
                 break;
             }
+            else if ((nivel_anterior == nivel_atual && certas[respondido - 1] && certas[respondido - 2]) || (nivel_anterior != nivel_atual && certas[respondido - 1]))
+            {
+                nivel_anterior = nivel_atual;
+                nivel_atual++;
+            }
             else
             {
                 nivel_anterior = nivel_atual;
-                nivel_atual--;
             }
         }
         else
         {
-            nivel_anterior = nivel_atual;
+            if ((nivel_atual == 5) || (nivel_anterior == nivel_atual && !certas[respondido - 1]) || (nivel_anterior != nivel_atual))
+            {
+                if (nivel_atual == 1)
+                {
+                    TerminarTeste();
+                    break;
+                }
+                else
+                {
+                    nivel_anterior = nivel_atual;
+                    nivel_atual--;
+                }
+            }
+            else
+            {
+                nivel_anterior = nivel_atual;
+            }
         }
+    }
+    catch
+    {
+        //caso seja a primeira pergunta
     }
     DecisoesTutor();
     respondido++;
