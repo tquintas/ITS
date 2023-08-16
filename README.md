@@ -9,14 +9,13 @@ Variaveis gerais:
 Variaveis do aluno:
 - tempo gasto numa pergunta
 - numero de respostas certas por um conceito
-- numero de respostas erradas por um conceito
 - vetor temporal perguntas repondidas por conceito (all time e session) (historico)
 - aceitação das decisoes do tutor
 
 Ações:
-- Muito tempo gasto num conceito + sucesso do conceitos < 0 = Scan
+- Muito tempo gasto num conceito + sucesso do conceitos < 0.5 = Scan
 - Varias respostas erradas "consecutivas" + baixo belief nos conceitos vizinhos = Revisao
-- Sucesso = 0 + Tendencia do aluno para aprofundar topicos = Aprofundar
+- Sucesso = 0.5 + Tendencia do aluno para aprofundar topicos = Aprofundar
 - Belief muito baixo + poucas questoes respondidas = Aprender
 - Belief isolado muito baixo num conceito + muitas questoes respondidas = Dificuldade num certo tópico
 - Muito tempo gasto num conceito + muitas perguntas respondidas de sessão = Yoga break
@@ -27,7 +26,7 @@ Variáveis do Tutor:
 //Tempo que o aluno gasta, relativamente ao tempo médio, por conceito
 double T_conceito = tempo_aluno_conceito / tempo_medio_conceito;
 //Sucesso do aluno para um determinado conceito
-double S_conceito = (certas_conceito - erradas_conceito) / respondidas_conceito;
+double S_conceito = certas_conceito / respondidas_conceito;
 //Tendencia para acertar
 double Tc_conceito = 0;
 int hSize = history_conceito.size();
@@ -45,6 +44,26 @@ for (int i = 0; i < hSize; --i)
 //Performance
 double performance = soma_percentagens_sucesso_aluno / soma_percentagens_sucesso_perguntas;
 ```
+
+A tendencia é guardada apenas como um número e em vez de ser calculada a partir de um vetor, é guardado o número na base de dados e sempre que o aluno responde a uma questão, é feito:
+```c++
+tendencia_acertar = (tendencia_acertar + (acertou ? 1 : 0)) / 2;
+double tendencia_errar = 1 - tendencia_acertar;
+```
+Assim, apenas é necessário guardar um número na base de dados, por conceito. Para atualizar o tempo por conceito, é usado o código (antes de adicionar a resposta à variavel `` respostas_conceito ``):
+```c++
+tempo_medio *= (respostas_conceito + (tempo_observado / tempo_medio)) / (respostas_conceito + 1);
+tempo_medio2 *= (respostas_conceito + (tempo_observado * tempo_observado / tempo_medio2)) / (respostas_conceito + 1);
+tempo_var = tempo_medio2 - (tempo_medio * tempo_medio);
+```
+
+A base de dados do tutor, entao, tem de ter a seguinte estrutura:
+| ID | UserId | Topic | Logs_Total | Logs_Session | Success_Total | Success_Session | Tendency | Time_Mean | Time_Mean2 | Time_Var | Belief |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 21 | Cp02_Algebra | 34 | 9 | 18 | 7 | 0.43781112314900383 | 63.41351616413721 | 5266.390409754405 | 1245.1163774551137 | 0.43 |
+
+
+
 
 Sempre que uma questão é respondida, o tutor avalia as probabilidades do aluno necessitar uma das ações e devolve a ação que apresenta maior probabilidade
 
