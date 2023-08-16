@@ -63,7 +63,7 @@ A base de dados do tutor, entao, tem de ter a seguinte estrutura:
 | 1 | 21 | Cp02_Algebra | 34 | 9 | 18 | 7 | 0.43781112314900383 | 63.41351616413721 | 5266.390409754405 | 1245.1163774551137 | 0.43 |
 
 
-
+---
 
 Sempre que uma questão é respondida, o tutor avalia as probabilidades do aluno necessitar uma das ações e devolve a ação que apresenta maior probabilidade
 
