@@ -3,19 +3,50 @@ Intelligent Tutoring System for SIACUA
 
 Variaveis gerais:
 - tempo medio numa pergunta
-- taxa de sucesso de uma pergunta
+- sucesso de uma pergunta
+- sucesso de um conceito
 
 Variaveis do aluno:
 - tempo gasto numa pergunta
-- numero de respostas certas para um conceito
-- numero de respostas erradas para um conceito
+- numero de respostas certas por um conceito
+- numero de respostas erradas por um conceito
+- vetor temporal perguntas repondidas por conceito (all time e session) (historico)
+- aceitação das decisoes do tutor
 
 Ações:
 - Muito tempo gasto num conceito + sucesso do conceitos < 0 = Scan
-- Varias respostas erradas consecutivas + baixo belief nos conceitos vizinhos = Revisao
+- Varias respostas erradas "consecutivas" + baixo belief nos conceitos vizinhos = Revisao
 - Sucesso = 0 + Tendencia do aluno para aprofundar topicos = Aprofundar
 - Belief muito baixo + poucas questoes respondidas = Aprender
-- 
+- Belief isolado muito baixo num conceito + muitas questoes respondidas = Dificuldade num certo tópico
+- Muito tempo gasto num conceito + muitas perguntas respondidas de sessão = Yoga break
+- taxa média de sucesso num teste + taxa média geral das perguntas do teste = Verificação da performance
+
+Variáveis do Tutor:
+```c++
+//Tempo que o aluno gasta, relativamente ao tempo médio, por conceito
+double T_conceito = tempo_aluno_conceito / tempo_medio_conceito;
+//Sucesso do aluno para um determinado conceito
+double S_conceito = (certas_conceito - erradas_conceito) / respondidas_conceito;
+//Tendencia para acertar
+double Tc_conceito = 0;
+int hSize = history_conceito.size();
+for (int i = 0; i < hSize; --i)
+{
+    if (history_conceito[i]) Tc_conceito += 1 / pow(2, hSize - i);
+}
+//Tendencia para errar
+double Te_conceito = 0;
+int hSize = history_conceito.size();
+for (int i = 0; i < hSize; --i)
+{
+    if (!history_conceito[i]) Te_conceito += 1 / pow(2, hSize - i);
+}
+//Performance
+double performance = soma_percentagens_sucesso_aluno / soma_percentagens_sucesso_perguntas;
+```
+
+Sempre que uma questão é respondida, o tutor avalia as probabilidades do aluno necessitar uma das ações e devolve a ação que apresenta maior probabilidade
 
 Cada teste constitui perguntas de nivel 1 até nivel 5. Assim que uma questão de nível 5 for respondida corretamente, o teste acaba. Quando todas as perguntas forem respondidas, o progresso fica a 100%. Um teste pode ter questões repetidas, desde que respeitem os níveis de dificuldade e que não tenham sido respondidas há pouco tempo. Um teste não pode ter mais de 20 (?) perguntas e o utilizador pode sair e entrar em qualquer altura do teste, sem perder o progresso.
 - acertar 3 perguntas consecutivas no mesmo nível = subir de nível
