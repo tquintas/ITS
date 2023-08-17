@@ -64,7 +64,11 @@ A base de dados do tutor, entao, tem de ter a seguinte estrutura:
 
 Cada questão pode ser modelada por uma distribuição de Bernoulli, onde os valores {0,1} significam {acertar, errar} e a probabilidade p de falhar depende da dificuldade da questão, do belief relacionado com os conceitos, da probabilidade de erros de calculo, da probabilidade de apenas adivinhar e principalmente da curva de aprendizagem do aluno.
 
-$$ \prod_{t}^{N} \mathcal{B}\left(\phi\left(q_t, g, s, d_t\right), o\right) $$
+$$ \prod_{t}^{N} \mathcal{B}\left(\phi\left(q_t, g_t, s_t, d_t, b_t\right), o\right) $$
+
+O fator de dificuldade é dado por $f_t = (6-d_t)^{5^{-b_t}}$ e assim se obtem o valor de $\phi$:
+
+$$ \phi\left(q_t, g_t, s_t, d_t, b_t\right) = q_t(1-g_t)(1-b_t)^{f_t} + (b_ts_t)^{f_t} $$
 
 ---
 
