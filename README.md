@@ -19,7 +19,6 @@ Ações:
 - Belief muito baixo + poucas questoes respondidas = Aprender
 - Belief isolado muito baixo num conceito + muitas questoes respondidas = Dificuldade num certo tópico
 - Muito tempo gasto num conceito + muitas perguntas respondidas de sessão = Yoga break
-- taxa média de sucesso num teste + taxa média geral das perguntas do teste = Verificação da performance
 
 Variáveis do Tutor:
 ```c++
@@ -41,8 +40,6 @@ for (int i = 0; i < hSize; --i)
 {
     if (!history_conceito[i]) Te_conceito += 1 / pow(2, hSize - i);
 }
-//Performance
-double performance = soma_percentagens_sucesso_aluno / soma_percentagens_sucesso_perguntas;
 ```
 
 A tendencia é guardada apenas como um número e em vez de ser calculada a partir de um vetor, é guardado o número na base de dados e sempre que o aluno responde a uma questão, é feito:
@@ -65,6 +62,12 @@ A base de dados do tutor, entao, tem de ter a seguinte estrutura:
 
 ---
 
+Cada questão pode ser modelada por uma distribuição de Bernoulli, onde os valores {0,1} significam {acertar, errar} e a probabilidade p de falhar depende da dificuldade da questão, do belief relacionado com os conceitos, da probabilidade de erros de calculo, da probabilidade de apenas adivinhar e principalmente da curva de aprendizagem do aluno.
+
+$$ \prod_{t}^{N} \mathbb{B}\left(\phi\left(q_t, g, s, d_t\right), o\right) $$
+
+---
+
 Sempre que uma questão é respondida, o tutor avalia as probabilidades do aluno necessitar uma das ações e devolve a ação que apresenta maior probabilidade
 
 Cada teste constitui perguntas de nivel 1 até nivel 5. Assim que uma questão de nível 5 for respondida corretamente, o teste acaba. Quando todas as perguntas forem respondidas, o progresso fica a 100%. Um teste pode ter questões repetidas, desde que respeitem os níveis de dificuldade e que não tenham sido respondidas há pouco tempo. Um teste não pode ter mais de 20 (?) perguntas e o utilizador pode sair e entrar em qualquer altura do teste, sem perder o progresso.
@@ -72,6 +75,7 @@ Cada teste constitui perguntas de nivel 1 até nivel 5. Assim que uma questão d
 - acertar 2 perguntas consecutivas aquando da mudança de nível = subir de nível
 - falhar a primeira pergunta aquando da mudança de nível = descida de nível
 - falhar 2 perguntas consecutivas no mesmo nível = descer de nível
+
 Código das perguntas:
 ```c++
 int nivel_anterior = 1;
