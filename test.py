@@ -14,7 +14,7 @@ def getInitialProbs(q, b, s, g, levels):
         ft = list(map(lambda i: (6-i)**(5**(-b)), q))
         phi = list(
             map(
-                lambda i: qt*(1-g)*(1-b)**i + (b*s)**i,
+                lambda i: qt*((1-g)*(1-b)**i + (b*s)**i),
                 ft
                 )
             )
@@ -38,7 +38,7 @@ def getLikelyhood(q, a, b, s, g, qt):
     ft = list(map(lambda i: (6-i)**(5**(-b)), q))
     phi = list(
         map(
-            lambda i: qt[i]*(1-g)*(1-b)**ft[i] + (b*s)**ft[i],
+            lambda i: qt[i]*((1-g)*(1-b)**ft[i] + (b*s)**ft[i]),
             range(len(q))
             )
         )
@@ -54,7 +54,7 @@ def getQfromPhi(q, b, s, g, phis):
     ft = list(map(lambda i: (6-i)**(5**(-b)), q))
     qs = list(
         map(
-            lambda i: (phis[i] - (b*s)**ft[i]) / ((1-g)*(1-b)**ft[i]),
+            lambda i: phis[i] / ((b*s)**ft[i] + (1-g)*(1-b)**ft[i]),
             range(len(q))
             )
         )
