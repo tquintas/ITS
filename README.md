@@ -68,7 +68,7 @@ $$ \prod_{t}^{N} \mathcal{B}\left(\phi\left(q_t, g_t, s_t, d_t, b_t\right), o\ri
 
 O fator de dificuldade é dado por $f_t = (6-d_t)^{5^{-b_t}}$ e assim se obtem o valor de $\phi$:
 
-$$ \phi\left(q_t, g_t, s_t, d_t, b_t\right) = q_t\left((1-g_t)(1-b_t)^{f_t} + (b_ts_t)^{f_t\right) $$
+$$ \phi\left(q_t, g_t, s_t, d_t, b_t\right) = q_t\left((1-g_t)(1-b_t)^{f_t} + (b_ts_t)^{f_t}\right) $$
 
 O vetor de valores de $q_t$ definem a curva de aprendizagem de cada cluster.
 
