@@ -35,10 +35,10 @@ def getInitialLikes(q, a, b, s, g, levels):
     return likes
 
 def getLikelyhood(q, a, b, s, g, qt):
-    ft = list(map(lambda i: (6-i)**(5**(-b)), q))
+    ft = list(map(lambda i: (6-q[i])**(5**(-b[i])), range(len(q))))
     phi = list(
         map(
-            lambda i: qt[i]*((1-g)*(1-b)**ft[i] + (b*s)**ft[i]),
+            lambda i: qt[i]*((1-g)*(1-b[i])**ft[i] + (b[i]*s)**ft[i]),
             range(len(q))
             )
         )
@@ -51,10 +51,10 @@ def getLikelyhood(q, a, b, s, g, qt):
     return p
 
 def getQfromPhi(q, b, s, g, phis):
-    ft = list(map(lambda i: (6-i)**(5**(-b)), q))
+    ft = list(map(lambda i: (6-q[i])**(5**(-b[i])), range(len(q))))
     qs = list(
         map(
-            lambda i: phis[i] / ((b*s)**ft[i] + (1-g)*(1-b)**ft[i]),
+            lambda i: phis[i] / ((b[i]*s)**ft[i] + (1-g)*(1-b[i])**ft[i]),
             range(len(q))
             )
         )
@@ -62,9 +62,10 @@ def getQfromPhi(q, b, s, g, phis):
 
 def EM(q, b, s, g, k, ans, alpha=1, beta=1, iters=15):
     mean_q = []
+    mean_b = []
     for i in range(len(q[0])):
         mean_q.append(sum(map(lambda v: v[i]/len(q), q)))
-    mean_b = sum(b) / len(b)
+        mean_b.append(sum(map(lambda v: v[i]/len(b), b)))
     tn = len(ans[0])
     L_sj = [0] * len(ans)
     z_sj = [0] * len(ans)
@@ -99,20 +100,6 @@ def EM(q, b, s, g, k, ans, alpha=1, beta=1, iters=15):
             den = sum(map(lambda v: sum(v), z_sj))
             p_j[j] = num/den
     return p_j, q_tj
-        
-nq = 10
-groups = 3
-q = []
-a = []
-b = []
-for i in range(1000):
-    q.append(list(map(lambda _: 3, range(nq))))
-    a.append(randomAnswers(nq))
-    b.append(0.8)
-s = 0.1
-g = 0.25
-
-p, qs = EM(q, b, s, g, groups, a, 1, 1, 15)
 
 def ploting(groups, nq, p, qs):
     plt.figure()
@@ -122,5 +109,3 @@ def ploting(groups, nq, p, qs):
         plt.subplot(3,3,i+2)
         plt.plot(range(nq), qs[i])
     plt.show()
-
-ploting(groups, nq, p, qs)
