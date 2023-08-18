@@ -70,7 +70,7 @@ O fator de dificuldade é dado por $f_t = (6-d_t)^{5^{-b_t}}$ e assim se obtem o
 
 $$ \phi\left(q_t, g_t, s_t, d_t, b_t\right) = q_t(1-g_t)(1-b_t)^{f_t} + (b_ts_t)^{f_t} $$
 
-O vetor de valores de $q_t$ definem a curva de aprendizagem do aluno.
+O vetor de valores de $q_t$ definem a curva de aprendizagem de cada cluster.
 
 ---
 

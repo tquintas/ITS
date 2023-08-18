@@ -79,11 +79,6 @@ def EM(q, b, s, g, k, ans, alpha=1, beta=1, iters=15):
         for stu in range(len(ans)):
             Ls = []
             for j in range(k):
-                #likes = list(map(lambda t: q_tj[j][t] if ans[stu][t] else 1 - q_tj[j][t], range(tn)))
-                #qs = 1
-                #for l in likes:
-                #    qs *= l
-                #Ls.append(p_j[j] * qs)
                 Ls.append(p_j[j] * getLikelyhood(q[stu], ans[stu], b[stu], s, g, q_tj[j]))
             L_sj[stu] = Ls
         for stu in range(len(ans)):
@@ -98,7 +93,6 @@ def EM(q, b, s, g, k, ans, alpha=1, beta=1, iters=15):
             for t in range(tn):
                 num = alpha - 1 + sum(map(lambda stu: z_sj[stu][j]*ans[stu][t], range(len(ans))))
                 qj.append(num/den)
-            #q_tj[j] = qj
             q_tj[j] = getQfromPhi(mean_q, mean_b, s, g, qj)
         for j in range(k):
             num = alpha + beta - 2 + sum(map(lambda stu: z_sj[stu][j], range(len(ans))))
@@ -106,25 +100,27 @@ def EM(q, b, s, g, k, ans, alpha=1, beta=1, iters=15):
             p_j[j] = num/den
     return p_j, q_tj
         
-nq = 20
-groups = 1
+nq = 10
+groups = 3
 q = []
 a = []
 b = []
-for i in range(2):
-    q.append(list(map(lambda _: round(rd.random() * 4) + 1, range(nq))))
+for i in range(1000):
+    q.append(list(map(lambda _: 3, range(nq))))
     a.append(randomAnswers(nq))
-    b.append(0.5)
+    b.append(0.8)
 s = 0.1
 g = 0.25
 
-print(q,a)
-p, qs = EM(q, b, s, g, groups, a, 1, 1, 20)
+p, qs = EM(q, b, s, g, groups, a, 1, 1, 15)
 
-plt.figure()
-plt.subplot(3,3,1)
-plt.bar(range(groups), p)
-for i in range(groups):
-    plt.subplot(3,3,i+2)
-    plt.plot(range(nq), qs[i])
-plt.show()
+def ploting(groups, nq, p, qs):
+    plt.figure()
+    plt.subplot(3,3,1)
+    plt.bar(range(groups), p)
+    for i in range(groups):
+        plt.subplot(3,3,i+2)
+        plt.plot(range(nq), qs[i])
+    plt.show()
+
+ploting(groups, nq, p, qs)
