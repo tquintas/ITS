@@ -73,9 +73,9 @@ $$ {\bf b} =
 \end{bmatrix}    
 $$
 
-$$ P({\bf Q}, {\bf p}, {\bf v}) = \prod^N_n {\mathcal B}\left( \left({\bf Q}_n \cdot {\bf b} {\bf p}_n \right), {\bf v}_n \right) $$
+$$ P({\bf Q}, {\bf p}, {\bf v}) = \prod^N_n {\mathcal B}\left( \left({\bf Q}_n \cdot {\bf b} \right) ({\bf p}_n), {\bf v}_n \right) $$
 
-$$ \sum^K_k p_k \prod^N_n {\mathcal B}\left( \left({\bf Q}_n \cdot {\bf b}_k {\bf p}_n \right), {\bf v}_n \right) $$
+$$ \sum^K_k p_k \prod^N_n {\mathcal B}\left( \left({\bf Q}_n \cdot {\bf b}_k \right) ({\bf p}_n), {\bf v}_n \right) $$
 
 ---
 
