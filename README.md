@@ -63,7 +63,7 @@ A base de dados do tutor, entao, tem de ter a seguinte estrutura:
 
 Tendo 5 dificuldades, seja:
 
-$$ {\bf b} =
+$$ {\boldsymbol \beta} =
 \begin{bmatrix}
     \text{Beta}\left(\alpha_1, 1 - \alpha_1\right) \\
     \text{Beta}\left(\alpha_2, 1 - \alpha_2\right) \\
@@ -75,9 +75,11 @@ $$
 
 Onde $\alpha_i$ é o sucesso de uma questão de dificuldade $i$.
 
-$$ P({\bf Q}, {\bf p}, {\bf v}) = \prod^N_n {\mathcal B}\left( \left({\bf Q}_n \cdot {\bf b} \right) (1 - {\bf p}_n), {\bf v}_n \right) $$
+$$ L({\bf Q}, {\bf p}, {\bf v}) = \prod^N_n {\mathcal B}\left( \left({\bf Q}_n \cdot {\boldsymbol \beta} \right) (1 - {\bf p}_n), {\bf v}_n \right) $$
 
-$$ \sum^K_k p_k \prod^N_n {\mathcal B}\left( \left({\bf Q}_n \cdot {\bf b}_k \right) (1 - {\bf p}_n), {\bf v}_n \right) $$
+O {\it mixture model} é:
+
+$$ \sum^K_k p_k \prod^N_n {\mathcal B}\left( \left({\bf Q}_n \cdot {\boldsymbol \beta}_k \right) (1 - {\bf p}_n), {\bf v}_n \right) $$
 
 ---
 
