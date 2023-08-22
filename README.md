@@ -75,6 +75,8 @@ $$
 
 $$ P({\bf Q}, {\bf v}) = \prod^N_n {\mathcal B}\left( {\bf Q}_n \cdot {\bf b}, {\bf v}_n \right) $$
 
+$$ \sum^K_k p_k \prod^N_n {\mathcal B}\left( {\bf Q}_n \cdot {\bf b}_k, {\bf v}_n \right) $$
+
 ---
 
 Sempre que uma questão é respondida, o tutor avalia as probabilidades do aluno necessitar uma das ações e devolve a ação que apresenta maior probabilidade
