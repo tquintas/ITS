@@ -65,17 +65,19 @@ Tendo 5 dificuldades, seja:
 
 $$ {\bf b} =
 \begin{bmatrix}
-    \text{Beta}\left(\alpha_1, \beta_1\right) \\
-    \text{Beta}\left(\alpha_2, \beta_2\right) \\
-    \text{Beta}\left(\alpha_3, \beta_3\right) \\
-    \text{Beta}\left(\alpha_4, \beta_4\right) \\
-    \text{Beta}\left(\alpha_5, \beta_5\right)
+    \text{Beta}\left(\alpha_1, 1 - \alpha_1\right) \\
+    \text{Beta}\left(\alpha_2, 1 - \alpha_2\right) \\
+    \text{Beta}\left(\alpha_3, 1 - \alpha_3\right) \\
+    \text{Beta}\left(\alpha_4, 1 - \alpha_4\right) \\
+    \text{Beta}\left(\alpha_5, 1 - \alpha_5\right)
 \end{bmatrix}    
 $$
 
-$$ P({\bf Q}, {\bf p}, {\bf v}) = \prod^N_n {\mathcal B}\left( \left({\bf Q}_n \cdot {\bf b} \right) ({\bf p}_n), {\bf v}_n \right) $$
+Onde $\alpha_i$ é o sucesso de uma questão de dificuldade $i$.
 
-$$ \sum^K_k p_k \prod^N_n {\mathcal B}\left( \left({\bf Q}_n \cdot {\bf b}_k \right) ({\bf p}_n), {\bf v}_n \right) $$
+$$ P({\bf Q}, {\bf p}, {\bf v}) = \prod^N_n {\mathcal B}\left( \left({\bf Q}_n \cdot {\bf b} \right) (1 - {\bf p}_n), {\bf v}_n \right) $$
+
+$$ \sum^K_k p_k \prod^N_n {\mathcal B}\left( \left({\bf Q}_n \cdot {\bf b}_k \right) (1 - {\bf p}_n), {\bf v}_n \right) $$
 
 ---
 
