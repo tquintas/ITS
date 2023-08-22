@@ -44,8 +44,7 @@ for (int i = 0; i < hSize; --i)
 
 A tendencia é guardada apenas como um número e em vez de ser calculada a partir de um vetor, é guardado o número na base de dados e sempre que o aluno responde a uma questão, é feito:
 ```c++
-tendencia_acertar = (tendencia_acertar + (acertou ? 1 : 0)) / 2;
-double tendencia_errar = 1 - tendencia_acertar;
+tendencia_errar = (tendencia_errar + (errou ? 1 : 0)) / 2
 ```
 Assim, apenas é necessário guardar um número na base de dados, por conceito. Para atualizar o tempo por conceito, é usado o código (antes de adicionar a resposta à variavel `` respostas_conceito ``):
 ```c++
@@ -62,15 +61,17 @@ A base de dados do tutor, entao, tem de ter a seguinte estrutura:
 
 ---
 
-Cada questão pode ser modelada por uma distribuição de Bernoulli, onde os valores {0,1} significam {acertar, errar} e a probabilidade p de falhar depende da dificuldade da questão, do belief relacionado com os conceitos, da probabilidade de erros de calculo, da probabilidade de apenas adivinhar e principalmente da curva de aprendizagem do aluno.
+Tendo 5 dificuldades, seja:
 
-$$ \prod_{t}^{N} \mathcal{B}\left(\phi\left(q_t, g_t, s_t, d_t, b_t\right), o\right) $$
-
-O fator de dificuldade é dado por $f_t = (6-d_t)^{5^{-b_t}}$ e assim se obtem o valor de $\phi$:
-
-$$ \phi\left(q_t, g_t, s_t, d_t, b_t\right) = q_t\left((1-g_t)(1-b_t)^{f_t} + (b_ts_t)^{f_t}\right) $$
-
-O vetor de valores de $q_t$ definem a curva de aprendizagem de cada cluster.
+$$ {\bf b} =
+\begin{bmatrix}
+    \text{Beta}\left(\alpha_1, \beta_1\right) \\
+    \text{Beta}\left(\alpha_2, \beta_2\right) \\
+    \text{Beta}\left(\alpha_3, \beta_3\right) \\
+    \text{Beta}\left(\alpha_4, \beta_4\right) \\
+    \text{Beta}\left(\alpha_5, \beta_5\right)
+\end{bmatrix}    
+$$
 
 ---
 
