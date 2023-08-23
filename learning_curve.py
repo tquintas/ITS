@@ -1,5 +1,6 @@
 import random2 as rd
 import matplotlib.pyplot as plt
+from scipy import stats
 
 def randomAnswers(n):
     a = []
@@ -7,75 +8,56 @@ def randomAnswers(n):
         a.append(round(rd.random()))
     return a
 
-def getInitialProbs(q, b, s, g, levels):
-    probs = []
-    for j in range(levels, 0, -1):
-        qt = (j / levels)**1
-        ft = list(map(lambda i: (6-i)**(5**(-b)), q))
-        phi = list(
-            map(
-                lambda i: qt*((1-g)*(1-b)**i + (b*s)**i),
-                ft
-                )
-            )
-        probs.append(phi)
-    return probs
-
-def getInitialLikes(q, a, b, s, g, levels):
-    likes = []
-    probs = getInitialProbs(q, b, s, g, levels)
-    for j in range(levels):
-        p = 1
-        for i in range(len(q)):
-            if a[i]:
-                p *= probs[j][i]
-            else:
-                p *= 1 - probs[j][i]
-        likes.append(p)
-    return likes
-
-def getLikelyhood(q, a, b, s, g, qt):
-    ft = list(map(lambda i: (6-q[i])**(5**(-b[i])), range(len(q))))
-    phi = list(
-        map(
-            lambda i: qt[i]*((1-g)*(1-b[i])**ft[i] + (b[i]*s)**ft[i]),
-            range(len(q))
-            )
-        )
+def getLikelyhood(qt, vt):
     p = 1
-    for i in range(len(q)):
-        if a[i]:
-            p *= phi[i]
+    for i in range(len(vt)):
+        if vt[i]:
+            p *= qt[i]
         else:
-            p *= 1 - phi[i]
+            p *= 1 - qt[i]
     return p
 
-def getQfromPhi(q, b, s, g, phis):
-    ft = list(map(lambda i: (6-q[i])**(5**(-b[i])), range(len(q))))
-    qs = list(
-        map(
-            lambda i: phis[i] / ((b[i]*s)**ft[i] + (1-g)*(1-b[i])**ft[i]),
-            range(len(q))
-            )
-        )
-    return qs
+def getPriorQ(qs, bs, g, s):
+    alphas = []
+    betas = []
+    c = len(qs)
+    def getPs(b):
+        if b < 0.05:
+            return g
+        elif b > 0.95:
+            return s
+        else:
+            m = (s - g) / 0.9
+            i = s - 0.95*m
+            return m*b + i
+    ps = list(map(getPs, bs))
+    p = 1
+    for i in range(c):
+        alpha = ps[i] * qs[i]
+        alphas.append(alpha)
+        beta = (1-ps[i]) * qs[i]
+        betas.append(beta)
+        p *= stats.beta.pdf(getPs(bs[i]), alpha, beta)
+    return p, alphas, betas
 
-def EM(q, b, s, g, k, ans, alpha=1, beta=1, iters=15):
-    mean_q = []
-    mean_b = []
-    for i in range(len(q[0])):
-        mean_q.append(sum(map(lambda v: v[i]/len(q), q)))
-        mean_b.append(sum(map(lambda v: v[i]/len(b), b)))
-    tn = len(ans[0])
-    L_sj = [0] * len(ans)
-    z_sj = [0] * len(ans)
+def EM(qs, bs, g, s, groups, vs, iters=15):
+    T = len(qs[0])
+    S = len(qs)
+    L_sj = [0] * S
+    z_sj = [0] * S
     q_tj = []
-    for j in range(k):
+    alphas_t = []
+    betas_t = []
+    
+    for s in range(S):
+        p, alphas, betas = getPriorQ(qs[s], bs[s], g, s)
+
+    for j in range(groups):
         qj = []
-        for t in range(tn):
+        for t in range(T):
             qj.append((rd.random()+j)/k)
         q_tj.append(qj)
-    p_j = [1/k] * k
+    p_j = [1/groups] * groups
     for _ in range(iters):
         for stu in range(len(ans)):
             Ls = []
