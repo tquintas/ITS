@@ -75,15 +75,15 @@ $$
 
 Onde $\alpha_i$ é o sucesso de uma questão de dificuldade $i$.
 
-$$ L({\bf Q}, {\bf p}, {\bf v}) = \prod^N_n {\mathcal B}\left( \left({\bf Q}_n \cdot {\boldsymbol \beta} \right) (1 - {\bf p}_n), {\bf v}_n \right) $$
+$$ L({\bf Q}, {\bf b}, {\bf v}) = \prod^N_n {\mathcal B}\left( \left({\bf Q}_n \cdot {\boldsymbol \beta} \right) (1 - {\bf b}_n), {\bf v}_n \right) $$
 
 O _mixture model_ é:
 
-$$ \sum^K_k \rho_k \prod^N_n {\mathcal B}\left( \left({\bf Q}_n \cdot {\boldsymbol \beta}_k \right) (1 - {\bf p}_n), {\bf v}_n \right) $$
+$$ \sum^K_k \rho_k \prod^N_n {\mathcal B}\left( \left({\bf Q}_n \cdot {\boldsymbol \beta}_k \right) (1 - {\bf b}_n), {\bf v}_n \right) $$
 
 Para ${\bf Q}^s, {\bf p}^s, {\bf v}^s$ onde $s$ representa um aluno, para um número $K$ de componentes tem-se que:
 
-$$ L_{s,k} \leftarrow \rho_k \prod^N_{n=1} {\mathcal B}\left( \left({\bf Q}^s_n \cdot {\boldsymbol \beta}_k \right) (1 - {\bf p}^s_n), {\bf v}^s_n \right) $$
+$$ L_{s,k} \leftarrow \rho_k \prod^N_{n=1} {\mathcal B}\left( \left({\bf Q}^s_n \cdot {\boldsymbol \beta}_k \right) (1 - {\bf b}^s_n), {\bf v}^s_n \right) $$
 
 $$ z_{s,k} \leftarrow \frac{L_{s,k}}{\sum_{k'}L_{s,k'}} $$
 

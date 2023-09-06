@@ -1,4 +1,5 @@
-from learning_curve import *
+import random2 as rd
+import time as _t
 
 def QuestionLevel(level):
     a = round(5 * (2*rd.random() - 1), level-1)
@@ -18,6 +19,7 @@ def AnswerQuestion(level):
     r = QuestionLevel(level)
     print(r)
     letters = ["a", "b", "c", "d"]
+    t1 = _t.time()
     while True:
         ans = str(input("Answer: "))
         if ans not in letters:
@@ -26,16 +28,17 @@ def AnswerQuestion(level):
         else:
             ans = letters.index(ans)
             break
-    return r == ans
+    time = _t.time() - t1
+    return r == ans , time
 
-def SaveToBD(level_list, missed, bs):
+def SaveResultsToBD(level_list, missed, bs):
     with open("results.txt", "w+") as f:
-        f.write(len(level_list)+";")
+        f.write(str(len(level_list))+";")
         f.write(str(level_list)+";")
         f.write(str(missed)+";")
         f.write(str(bs)+"\n")
 
-def LoadFromBD(n):
+def LoadResultsFromBD(n):
     level_list = []
     missed = []
     bs = []
@@ -49,22 +52,32 @@ def LoadFromBD(n):
                 bs.append(contents[3].strip("][").split(", "))
     return level_list, missed, bs
 
-def Stats(n):
-    g = 0.25
-    s = 0.05
-    groups = 3
-    level_list, missed, bs = LoadFromBD(n)
-    p, q = EM([level_list], [bs], s, g, groups, [missed], 1, 1, 15)
-    ploting(groups, len(level_list[0]), p, q)
+def SaveTutorVars(user, topic, logs, logs_session, ):
+    with open("tutor_vars.txt", "w+") as f:
+        pass
 
-def StartTest(b, max_questions = 20):
+def TutorDecisions():
+    
+    #verifica se a media dos tempos está no intervalo de confiança a 95%
+    #verifica se o sucesso é baixo
+    #verifica se o aluno respondeu a muitas ou poucas questões (da sessao ou total)
+    #verifica se o belief é baixo e se o belief dos pais também é baixo
+    #verifica se a tendência é alta
+    #utilizar os diferentes valores num modelo estatistico para determinar qual decisão tem maior likelyhood de acontecer
+    pass
+
+def StartTest(b, n_questions = 10):
     level = 1
     level_list = []
     missed = []
     bs = []
-    N = 0
-    while N < max_questions:
-        missed.append(not AnswerQuestion(level))
+    times = []
+    N = 1
+    while N <= n_questions:
+        print(f"Question {N}:")
+        right, time = AnswerQuestion(level)
+        times.append(time)
+        missed.append(not right)
         level_list.append(level)
         bs.append(b)
         try:
@@ -73,26 +86,22 @@ def StartTest(b, max_questions = 20):
                 if b < 0: b = 0
                 print("Wrong!")
                 if level == 5 or (level_list[-2] == level and missed[-2]) or level_list[-2] != level:
-                    if level == 1:
-                        print("Test failed!")
-                        break
-                    else:
+                    if level != 1:
                         print("Level down...")
                         level -= 1
             else:
                 b += 0.05
                 if b > 1: b = 1
                 print("Correct!")
-                if level == 5:
-                    print("Test completed!")
-                    break
-                elif (level_list[-2] == level and not missed[-2] and not missed[-3]) or (level_list[-2] == level and level_list[-2] != level_list[-3] and  not missed[-2] and not missed[-3]):
+                if level != 5 and (level_list[-2] == level and not missed[-2] and not missed[-3]) or (level_list[-2] == level and level_list[-2] != level_list[-3] and  not missed[-2] and not missed[-3]):
                     print("Level up!")
                     level += 1
         except:
             pass
-        #TutorDecisions()
+        TutorDecisions()
         N += 1
         print("\n")
-    SaveToBD(level_list, missed, bs)
-    Stats(len(level_list))
+    mean_time = sum(times)/len(times)
+    print(f"Your mean time was {mean_time} seconds.")
+    TutorDecisions()
+    return level_list, missed, bs
