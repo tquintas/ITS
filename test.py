@@ -69,7 +69,64 @@ def t_its(n=1000):
     print(t)
     return x,y
 
-for _ in range(1):
-    x,y = t_its(10)
-    plt.plot(x,y)
-plt.show()
+def test2(ts):
+    Q = [[1,0,0,1],[1,0,0,0],[1,0,1,0],[0,0,0,1]]
+    t1 = ts[0]
+    t2 = ts[1]
+    t3 = ts[2]
+    L = []
+    for s in Q:
+        l = []
+        p = 1
+        for i in range(4):
+            if s[i] == 1:
+                p *= t1[i]
+            else:
+                p *= 1 - t1[i]
+        l.append(p)
+        p = 1
+        for i in range(4):
+            if s[i] == 1:
+                p *= t2[i]
+            else:
+                p *= 1 - t2[i]
+        l.append(p)
+        p = 1
+        for i in range(4):
+            if s[i] == 1:
+                p *= t3[i]
+            else:
+                p *= 1 - t3[i]
+        l.append(p)
+        L.append(l)
+    Z = L.copy()
+    for i in range(4):
+        Z[i] = list(map(lambda j: round(j / sum(L[i]),2), L[i]))
+    theta = []
+    for k in range(3):
+        tk = []
+        if k == 0:
+            a = 2
+        elif k == 1:
+            a = 0
+        else:
+            a = 4
+        b = 4
+        for i in range(4):
+            num = a
+            den = b
+            for j in range(4):
+                num += Z[j][k] * Q[j][i]
+                den += Q[j][i]
+            tk.append(num/den)
+        theta.append(tk)
+    return theta
+
+t1 = list(map(lambda i: round(rd.random(),2), range(4)))
+t2 = list(map(lambda i: round(rd.random(),2), range(4)))
+t3 = list(map(lambda i: round(rd.random(),2), range(4)))
+ts = [t1,t2,t3]
+print(ts)
+for _ in range(20):
+    ts = test2(ts)
+    print(ts)

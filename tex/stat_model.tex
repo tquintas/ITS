@@ -3,6 +3,7 @@
 \usepackage[T1]{fontenc}
 \usepackage[a4paper, portrait, margin=1in]{geometry}
 \usepackage{graphicx}
+\usepackage{subcaption}
 \usepackage{xcolor}
 \usepackage{colortbl}
 \usepackage{amscd,amsmath,amssymb,amsthm}
@@ -24,6 +25,10 @@
 \newcommand{\Lh}[2]{L\!\left(#1 \mid #2\right)}
 \newcommand{\LRA}{\Leftrightarrow\mkern40mu}
 \newcommand{\GEV}[3]{\text{GEV}\!\left(#1,#2,#3\right)}
+\newcommand{\GEVcdf}[4]{\text{GEV}_\text{cdf}\!\left(#1;#2,#3,#4\right)}
+\newcommand{\openinter}[2]{\left]#1,#2\right[}
+\newcommand{\lopeninter}[2]{\left]#1,#2\right]}
+\newcommand{\ropeninter}[2]{\left[#1,#2\right[}
 
 \title{
 \textbf{\huge{Development of an Intelligent Tutoring System using mixture modelling of learning curves}}
@@ -44,11 +49,12 @@
     \item How does SIACUA work?
     \item What are the ITS' objectives?
 \end{itemize}
-\lipsum[1-3]
 \subsection{Related Work}
-\lipsum[4-6]
+\begin{itemize}
+    \item What other papers have done?
+\end{itemize}
 \section{Mixture modelling}
-Imagine a student starts answers correctly to a question of difficulty $i$, while having a knowledge belief of $b_1$ for that topic.
+Imagine a student starts answering a question of difficulty $i$, while having a knowledge belief of $b_1$ for that topic.
 If we consider the binary set $e = \left\{0,1\right\}$ for the two outcomes for the answer, where $0$ means a correct answer and $1$ an incorrect answer,
 we can represent the full action with a vector for the question, ${\bf q}_i$, a number for the belief, $b_1$, and a number for the answer, $e_1$.
 \[ {\bf q}_i = [\underbrace{0 ~~ 0 ~~ \hdots \overbrace{1}^{i\textsuperscript{th}\text{ position}} \hdots ~~ 0}_d]^T \]
@@ -122,7 +128,7 @@ $$P({\boldsymbol \vartheta}) = \BBeta{\boldsymbol{\vartheta} \mid \boldsymbol{\h
     \Beta{\vartheta_d \mid \hat{\alpha}_d}{\hat{\beta}_d}
 \end{bmatrix} $$
 
-\subsection{Mixture Model and Bayesian Inference}
+\subsection{General Mixture Model and Bayesian Inference}
 Each possible learning curve can be a component of a probabilistic model, consisting on a product of Bernoulli distributions.
 A learning curve $\boldsymbol{\vartheta}$ represents the performance level of the student for each difficulty.
 The probability of the error vector ${\bf e}^s$ according to the learning curve $\boldsymbol{\vartheta}$ is
@@ -154,7 +160,7 @@ This means that, although the question matrices and the error vectors should be 
 \end{theorem}
 \begin{proof}
     To prove the theorem, for simplicity, let's first assume there's just one level of difficulty, i.e., ${\bf Q}^s = (\1_n)^T$ and each Bernoulli distribution is of the form $\mathcal{B}(\vartheta_k, e^s_n)$.
-    The likelihood $\Lh{{\bf e}^s}{\vartheta_k} = \prod_n \mathcal{B}(\vartheta_k, e^s_n)$ can be maximixed by calculating $\frac{\partial}{\partial \vartheta_k} \Lh{{\bf e}^s}{\vartheta_k} = 0 $, where $\vartheta_k \in (0,1)$.
+    The likelihood $\Lh{{\bf e}^s}{\vartheta_k} = \prod_n \mathcal{B}(\vartheta_k, e^s_n)$ can be maximixed by calculating $\frac{\partial}{\partial \vartheta_k} \Lh{{\bf e}^s}{\vartheta_k} = 0 $, where $\vartheta_k \in \openinter{0}{1}$.
     Because there's only one difficulty level, $\Lh{{\bf e}^s}{\vartheta_k} = \vartheta_k^w(1-\vartheta_k)^r$, where $r \ge 1$ and $w \ge 1$ mean the number of right and wrong answers, and
     \begin{align*}
         0 &= \frac{\partial}{\partial \vartheta_k} \Lh{{\bf e}^s}{\vartheta_k} \\
@@ -178,7 +184,7 @@ This means that, although the question matrices and the error vectors should be 
     \begin{equation}
         \forall \delta > 0 \;\; \exists \varepsilon > 0 \;\; \exists n,k \in \mathbb{N} \;\; \left| \vartheta_k - \frac{w}{w+r} \right| < \left| \frac{t}{w+r} \right| < \varepsilon \Rightarrow \left| \Lh{{\bf e}^{s'}}{\vartheta_k} - \Lh{{\bf e}^{s}}{\vartheta_k} \right| < \delta, \label{eq3}
     \end{equation}
-    which proofs that, for one difficulty, given sufficient components and provided enough data points, each error vector will converge on a single component, i.e., the one that maximizes the likelihood, which is the same as saying, the one that minimizes the distance $ \left| \vartheta_k - \frac{w}{w+r} \right| $, and, as $n \rightarrow +\infty$, error vectors with relatively small perturbations will converge to a true value for $\vartheta$.
+    which proves that, for one difficulty, given sufficient components and provided enough data points, each error vector will converge on a single component, i.e., the one that maximizes the likelihood, which is the same as saying, the one that minimizes the distance $ \left| \vartheta_k - \frac{w}{w+r} \right| $, and, as $n \rightarrow +\infty$, error vectors with relatively small perturbations will converge to a true value for $\vartheta$.
     This proves the statistical consistency to a model of just one difficulty.
     
     However, regarding $d$ difficulties, the likelihood function is of the type
@@ -192,31 +198,60 @@ This means that, although the question matrices and the error vectors should be 
     Each iteration is of the form:
     \begin{align}\begin{split}\label{alg1}
         {\bf L}_{s,k} &= \rho_k \cdot \varpi\left(\boldsymbol{\mathcal{B}}\left({\bf Q}^T \cdot \boldsymbol{\vartheta}_k, {\bf e}^s\right)\right) \\
-        {\bf Z} &= {\bf L} \circ \left({\bf L} \cdot \1_K\right)^{\circ-1} \\
-        \boldsymbol{\vartheta}_k &= \left( \boldsymbol{\alpha}_k + \sum_s \left({\bf Z}_{s,k} \circ {\bf w}^s\right) \right) \circ \left( \boldsymbol{\alpha}_k + \boldsymbol{\beta}_k + \sum_s\left({\bf Z}_{s,k} \circ {\bf n}^s\right) \right)^{\circ-1} \\
+        {\bf Z}_{s,k} &= \frac{{\bf L}_{s,k}}{\left({\bf L} \cdot \1_K\right)_s} \\
+        \boldsymbol{\vartheta}_k &= \left( \boldsymbol{\alpha}_k + \sum_s \left({\bf Z}_{s,k} \cdot {\bf w}^s\right) \right) \circ \left( \boldsymbol{\alpha}_k + \boldsymbol{\beta}_k + \sum_s\left({\bf Z}_{s,k} \cdot {\bf n}^s\right) \right)^{\circ-1} \\
         \boldsymbol{\rho} &= \frac{{\bf Z}^T \cdot \1_S}{(\1_S)^T \cdot {\bf Z} \cdot \1_K},
     \end{split}\end{align}
     where ${\bf w}^s = \left({\bf Q}^s \mid_c {\bf e}^s \right) \cdot \1_N$ and ${\bf n}^s = {\bf Q}^s \cdot \1_N$.
 \end{proof}
+\subsection{Model predictions}
+After implementing this algorithm and collecting enough data, we are predicting two types of learning curves: \textsl{exponential} and \textsl{logarithmic}.
+Both describe how the student adapts to higher levels of difficulty. The curves will be of the form:
+\begin{alignat}{4}
+    \vartheta(d) &= ae^{b(d-1)},\mkern20mu &0<a<1,~~&0<b<-\frac{\ln a}{4},\label{eqexp} \\
+    \vartheta(d) &= a + b\ln d,\mkern20mu &0<a<1,~~&0<b<\frac{1-a}{\ln 5},\label{eqlog}
+\end{alignat}
+where $a$ means the probability of answering incorrectly a question of level 1 and $b$ describes the steepness of the curve.
+\begin{figure}[ht!]
+    \centering
+    \begin{subfigure}[b]{0.4\linewidth}
+        \includegraphics[width=\linewidth]{exp.png}
+        \caption{Five possible learning curves following the exponential equation $\vartheta(d) = ae^{b(d-1)}$.}
+        \label{exp1}
+    \end{subfigure}\hspace{0.05\linewidth}
+    \begin{subfigure}[b]{0.4\linewidth}
+        \includegraphics[width=\linewidth]{log.png}
+        \caption{Five possible learning curves following the logarithmic equation $\vartheta(d) = a + b\ln d$.}
+        \label{log1}
+    \end{subfigure}
+    \caption{Predictions of the \textsl{exponential} \eqref{exp1} and the \textsl{logarithmic} \eqref{log1} curves.}
+    \label{fig1}
+\end{figure}
 
+After computing all the learning curves, it is possible to make exponential and logarithmic regressions on those curves, to find the parameters $a$ and $b$.
+Then, the residuals are calculated and the regression with smaller residuals gets assigned to the learning curve.
+Finnaly, to get two variables within the same range of values, $\openinter{0}{1}$, we retrieve the value $a$ and the value $b'=-\frac{4b}{\ln a}$, for \eqref{eqexp}, or $b'=\frac{b\ln 5}{1-a}$, for \eqref{eqlog}.
 \section{Intelligent Tutoring System}
-\lipsum[1]
+But how will the mixture model schedule practice routines for a student? The current method of SIACUA already uses bayesian networks to create a solid way to estimate a student's progress, but there isn't any approach to formulating schedules.
+Furthermore, the beliefs are just used as a prior for the values of the learning curves and are not sufficient to predict whether or not the student has mastered a certain topic.
+
+So, the goal of the ITS it to gather information about the beliefs and the parameters of the regressions in \eqref{fig1} and schedule practice routines for the students, based on suggestions and spontaneous feedback. Moreover, since various topics are taken into account, the algorithm \eqref{alg1} has to be used in another context, to provide more individual results about each student.
 \subsection{Variables}
 Every time a student answers a question, the ITS should calculate and store a series of variables that will help it deciding what to recommend to the student.
 There are two types of variables: \textsl{static variables} and \textsl{topic related variables}. The first ones are:
 \begin{itemize}
-    \item $T_{tutor}$ — tendency to follow the ITS' recommendations. Let $t \in \{0,1\}$ be the outcome for a new recommendation that pops up.
+    \item $T_\mathit{tutor}$ — tendency to follow the ITS' recommendations. Let $t \in \{0,1\}$ be the outcome for a new recommendation that pops up.
     Considering the vector ${\bf t}$ of the outcomes, each $t_i$ is a realization of a random variate $T_i \sim \mathcal{B}(p)$, with $0 < p < 1$, and because the newest values are more significant ($t_0$ is newer than $t_1$), if $X \sim \text{Geo}(p)$, then
     \begin{align*}
         T(p) &= \sum_{i=0}^{n-1} t_i \cdot \mathbb{P}(X = i), \\
-        T_{tutor} &= \max\left(\left.T(p)\right|_{\frac{\partial}{\partial p}T(p) = 0}\right).
+        T_\mathit{tutor} &= \max\left\{\left.T(p)\right|_{\frac{\partial}{\partial p}T(p) = 0}\right\}.
     \end{align*}
     It's possible to show that
     \begin{alignat*}{2}
         && 0 &= \frac{\partial}{\partial p}T(p) \\
         \LRA && 0 &= \sum_{i=0}^{n-1} t_i\left(1-(i+2)p\right)(1-p)^i,
     \end{alignat*}
-    and after computing the possible values for $p \in (0,1)$, they are again plugged in $T(p)$ and the maximum of those values will be the tendency $T_{tutor}$.
+    and after computing the possible values for $p \in \openinter{0}{1}$, they are again plugged in $T(p)$ and the maximum of those values will be the tendency $T_\mathit{tutor}$.
     \item $n_s$ — number of questions answered during the current session. Since this value ranges from $0$ to $+\infty$, it's normally interpreted as a Poisson distribution $N \sim \text{Pois}(\lambda_s)$, where $\lambda_s$ is the average of the number of questions answered each session, that is stored and updated everytime the session ends.
     It is used its cumulative distribution function to calculate the critical value for which the result is greater than $c$:
     \begin{align*}
@@ -241,10 +276,10 @@ There are two types of variables: \textsl{static variables} and \textsl{topic re
 \end{itemize}
 Apart from the first variables, the other \textsl{static variables} are reseted once the current session ends. The \textsl{topic related variables} are:
 \begin{itemize} 
-    \item $T_{miss}$ — tendency to make a mistake on a question. The calculations made are the same as the ones for $T_{tutor}$. Considering the error vector ${\bf e}$ and $X \sim \text{Geo}(p)$, for $0<p<1$,
+    \item $T_\mathit{miss}$ — tendency to make a mistake on a question. The calculations made are the same as the ones for $T_\mathit{tutor}$. Considering the error vector ${\bf e}$ and $X \sim \text{Geo}(p)$, for $0<p<1$,
     \begin{align*}
         T(p) &= \sum_{i=0}^{n-1} e_i \cdot \mathbb{P}(X = i), \\
-        T_{miss} &= \max\left(\left.T(p)\right|_{\frac{\partial}{\partial p}T(p) = 0}\right).
+        T_\mathit{miss} &= \max\left\{\left.T(p)\right|_{\frac{\partial}{\partial p}T(p) = 0}\right\}.
     \end{align*}
     \item $n$ — number of questions answered. Because this variable is relative to each topic, we don't need to assign a certain distribution because it will just define the shape of our later distributions.
     \item $t_q$ — current time spent on a single question, measured in seconds. The same variables as in $t$ are stored and we're left with the distribution
@@ -254,7 +289,7 @@ Apart from the first variables, the other \textsl{static variables} are reseted 
         && \mathbb{P}(Z_{t_p} \le z_c) &\ge c \\
         \LRA && z_c\sigma_{t_p} + \mu_{t_p} &= (t_p)_c.
     \end{alignat*}
-    \item $S$ — success rate. It's a ratio between the number of correct answers by the number of questions answered. The \textsl{lazy} value for the variable would be plain division between the number of right answers and $n$, but since time has also an important role on the success rate, a more accurate value would be $(1-p)$, where $p$ is the value assigned when calculating $T_{miss}$. The critical value for the success $p_c$ is the value that represents stagnation in progress.
+    \item $S$ — success rate. It's a ratio between the number of correct answers by the number of questions answered. The \textsl{lazy} value for the variable would be plain division between the number of right answers and $n$, but since time has also an important role on the success rate, a more accurate value would be $(1-p)$, where $p$ is the value assigned when calculating $T_\mathit{miss}$. The critical value for the success $p_c$ is the value that represents stagnation in progress.
     \item $b$ — current belief, retrieved from the bayesian network. This values are already computed by the web application but the ITS stores them for convenience. If we regard $B \sim \Beta{\alpha}{\beta}$ as a \textsl{clumsy} variate that models beliefs, where $\alpha$ and $\beta$ are the number of right and wrong answers, respectively, then as $\alpha$ and $\beta$ grow large,
     \begin{align*}
         B &\overset{a}{\sim} \mathcal{N}\!\left(\frac{\alpha}{\alpha+\beta}, \frac{\alpha\beta}{(\alpha+\beta)^2(\alpha+\beta+1)}\right) \\
@@ -273,7 +308,7 @@ Apart from the first variables, the other \textsl{static variables} are reseted 
     \item $b_n$ — average value of the beliefs from a topic and its neighbours. This variable follows the same logic as $b$ for the normal distribution.
 \end{itemize}
 
-\subsection{Decisions and Tutoring Curves}
+\subsection{Decisions}
 After computing and storing all the variables, the ITS performs addicional calculations to find if it needs to recommend something to the student. 
 To accomplish this, it corresponds each study suggestion with a variate such that all variates follow the same kind of distribution.
 Since we are dealing with multiple parameters and the ITS should only recommend something after crossing some threshold value, it is used the Generalized Extreme Value distribution for every tip.
@@ -285,33 +320,113 @@ The $6$ suggestions are:
 \begin{itemize}
     \item \textsl{Learn this topic}. You have little knowledge about it and have answered almost no questions.
     \begin{align*}
-        A_{learn} &\sim \GEV{b_c}{\sqrt{\frac{b(1-b)}{n+1}}}{n} \\
-        \mathbb{P}_{learn} &= \mathbb{P}\left(A_{learn} \le 1 - b\right).
+        A_\mathit{learn} &\sim \GEV{b_c}{\sqrt{\frac{b(1-b)}{n+1}}}{n} \\
+        \mathbb{P}_\mathit{learn} &= \mathbb{P}\left(A_\mathit{learn} \le 1 - b\right)
     \end{align*}
     \item \textsl{Do a quick scan}. You are spending too much time answering these questions and you are answering incorrectly most of the questions.
     \begin{align*}
-        A_{scan} &\sim \GEV{(t_p)_c}{{\sigma_t}_p}{S} \\
-        \mathbb{P}_{scan} &= \mathbb{P}\left(A_{scan} \le t_p\right).
+        A_\mathit{scan} &\sim \GEV{(t_p)_c}{{\sigma_t}_p}{S} \\
+        \mathbb{P}_\mathit{scan} &= \mathbb{P}\left(A_\mathit{scan} \le t_p\right)
     \end{align*}
     \item \textsl{Revise these concepts}. You are making too many mistakes and you have little knowledge about that topic and neighbouring topics.
     \begin{align*}
-        A_{revise} &\sim \GEV{(b_n)_c}{\sqrt{\frac{b_n(1-b_n)}{n+1}}}{T_{miss}} \\
-        \mathbb{P}_{scan} &= \mathbb{P}\left(A_{scan} \le 1 - b_n\right).
+        A_\mathit{revise} &\sim \GEV{(b_n)_c}{\sqrt{\frac{b_n(1-b_n)}{n+1}}}{T_\mathit{miss}} \\
+        \mathbb{P}_\mathit{revise} &= \mathbb{P}\left(A_\mathit{revise} \le 1 - b_n\right)
     \end{align*}
     \item \textsl{Deepen this topic}. I see you listen to my recommendations but you still aren't making any progress whatsoever.
     \begin{align*}
-        A_{deepen} &\sim \GEV{p_c}{\sqrt{S(1-S)}}{1-T_{tutor}} \\
-        \mathbb{P}_{deepen} &= \mathbb{P}\left(A_{deepen} \le S\right).
+        A_\mathit{deepen} &\sim \GEV{p_c}{\sqrt{S(1-S)}}{1-T_\mathit{tutor}} \\
+        \mathbb{P}_\mathit{deepen} &= \mathbb{P}\left(A_\mathit{deepen} \le S\right)
     \end{align*}
     \item \textsl{Focus on this topic}. Inspite of answering to a lot of questions about this, you seem to have low knowledge about it.
     \begin{align*}
-        A_{focus} &\sim \GEV{b_c}{\sqrt{S(1-S)}}{\frac{1}{n}} \\
-        \mathbb{P}_{focus} &= \mathbb{P}\left(A_{focus} \le 1 - b\right).
+        A_\mathit{focus} &\sim \GEV{b_c}{\sqrt{S(1-S)}}{\frac{1}{n}} \\
+        \mathbb{P}_\mathit{focus} &= \mathbb{P}\left(A_\mathit{focus} \le 1 - b\right)
     \end{align*}
-    \item \textsl{Time to take a break}. I see you are spending too much time in every question and you have already answered a lot of questions.
+    \item \textsl{Time to take a break}. I see you are spending too much time in every question and you have already answered a lot of questions in this session.
     \begin{align*}
-        A_{break} &\sim \GEV{t_c}{\sigma_t}{\frac{1}{n_s}} \\
-        \mathbb{P}_{break} &= \mathbb{P}\left(A_{break} \le t\right).
+        A_\mathit{break} &\sim \GEV{t_c}{\sigma_t}{\frac{1}{n_s}} \\
+        \mathbb{P}_\mathit{break} &= \mathbb{P}\left(A_\mathit{break} \le t\right)
     \end{align*}
 \end{itemize}
+
+After calculating all the probabilities, we perform a $t$-test on the maximum probability, where the significance level is determined by the beliefs, because the higher the knowledge level in some topic, the less the need of practice scheduling.
+\begin{align*}
+    \mathbb{P} &= \left\{\mathbb{P}_\mathit{learn}, \mathbb{P}_\mathit{scan}, \mathbb{P}_\mathit{revise}, \mathbb{P}_\mathit{deepen}, \mathbb{P}_\mathit{focus}, \mathbb{P}_\mathit{break}\right\}, \\
+    M_\mathbb{P} &= \max\{\mathbb{P}\}, \\
+    \mathbb{P}' &= \mathbb{P}\backslash M_\mathbb{P}, \\
+    U &= \overline{\mathbb{P}'} + t_{4,b}\frac{s_{\mathbb{P}'}}{\sqrt{5}}.
+\end{align*}
+If $M_\mathbb{P} > U$, then we must reject the null hypothesis and conclude that the action associated with $M_\mathbb{P}$ should be recommended, with a significance level of $b$.
+
+\subsection{Tutoring Curves}
+
+The only variable that's missing its calculation is the variable $c$ for the critical value. That's when the tutoring curves take place, using the same algorithm \eqref{alg1}.
+However, instead of using data from all students, just the last $10$ tests from the student that will perform the next test are taken into account. We initiate the algorithm with three components:
+\begin{enumerate}
+    \item a primary component, with random values for $\vartheta_k$, but where the prior for $\alpha_k$ and $\beta_k$ are the ones calculated by the \textsl{clumsy} variate that models the beliefs, using the current belief.
+    \item a \textsl{lucky} component, with random values for $\vartheta_k$, $\alpha_k = 0$ and $\beta_k$ is equal to the number of questions answered per test.
+    \item an \textsl{unlucky} component, with random values for $\vartheta_k$, $\beta_k = 0$ and $\alpha_k$ is equal to the number of questions answered per test.
+\end{enumerate}
+By the properties of the algorithm \eqref{alg1}, the \textsl{lucky} and \textsl{unlucky} components model the extreme case where the student could answer all questions right and wrong, respectively, providing curves with very low and very high probabilities.
+After answering the questions of the new test, the ITS would then apply the results onto the mixture model to find the curve where the student fits the most, recording the percentage of the likelihood of the primary component (represented by $\mathbb{L}$), relative to the others.
+\begin{align*}
+    \mathbb{P}({\bf e}) &= \sum_{k \in \left\{\mathit{primary},\mathit{lucky},\mathit{unlucky}\right\}} \rho_k \cdot \varpi\left(\boldsymbol{\mathcal{B}}\left({\bf Q}^T \cdot \boldsymbol{\vartheta}_k, {\bf e}\right)\right) \\
+    \mathbb{L} &= \frac{\rho_\mathit{primary} \cdot \varpi\left(\boldsymbol{\mathcal{B}}\left({\bf Q}^T \cdot \boldsymbol{\vartheta}_\mathit{primary}, {\bf e}\right)\right)}{\mathbb{P}({\bf e})}.
+\end{align*}
+The variable $\mathbb{L}$ measures how consistent the student's practice routines are, so the lower the value, the lower is the confidence that the test is truthful. If the primary tutoring curve is too close to the lucky or unlucky tutoring curves, then we discard the one closest to the primary one.
+
+Then, using exponential or logarithmic regressions, the values for $0<a<1$ and $0<b'<1$ are calculated to get the critical value $c$.
+We place the point $(a,b')$ in the rectangle $R = \openinter{0}{1}\times\openinter{0}{1}$ and compute the distance from the point to the corner $(1,1)$.
+Although, we need to account for $\mathbb{L}$, as the lower it is, the close to the center of the rectangle the points goes. With a bit of vector algebra,
+\begin{alignat*}{2}
+    && (x,y) &= \left(a + (1-\mathbb{L})\left(\frac{1}{2} - a\right),b' + (1-\mathbb{L})\left(\frac{1}{2} - b'\right)\right) \\
+    \LRA && (x,y) &= \left(\frac{1}{2}+\mathbb{L}\left(a-\frac{1}{2}\right),\frac{1}{2}+\mathbb{L}\left(b'-\frac{1}{2}\right)\right) \\
+    \LRA && (x,y) &= \frac{1}{2}\left(1+\mathbb{L}(2a-1),1+\mathbb{L}(2b'-1)\right)
+\end{alignat*}
+From that, we normalize the distance and
+\begin{align*}
+    c &= \frac{\left\|(x,y) - (1,1)\right\|}{\sqrt{2}}.
+\end{align*}
+This means that the lower the distance, the lower the critical value for the threshold for the ITS' recommendations. This can produce very high results to all decision thresholds but since we are performing $t$-tests to ponder which suggestion to make, it just prompts the ITS to schedule practice routines more regularly.
+
+\section{Notifications and Constructing Feedback}
+Apart from the 6 main suggestions, the ITS should also be able to provide notifications and constructive (either positive and negative) feedback in real-time. While the notifications are shown before the test, feedback is shown during each test and not at the end, and uses different criteria for possible suggestions.
+
+Evey time a student clicks on a notification or answers a question, the ITS learns something about that student and, based on that information, provides other notifications and feedbacks that enhances his study performance.
+We call this the \textsl{reward}, and everytime the ITS is prompted to give notifications and feedback, it calculates the one with the highest reward.
+
+\subsection{Notifications}
+Notifications will just pop up on the main page of the web application. They are clickable links that redirect the user to some page or exercise.
+Every time the student logs on, the notification with highest reward at the moment will appear. Subsequent visits to the main page will not always produce notifications.
+\subsubsection{Reward}
+Every notification can be clicked or ignored, and after being clicked it can either result in a success or in a failure.
+So, for every notification $t$ we have the set of outcomes $c_t = \{0,1\}$ for the click and $r_t = \{0,1\}$ for the success.
+
+We say a notification is elegible when it meets certain criteria, like test-streaks and belief values.
+\subsubsection{List of Notifications}
+\begin{itemize}
+    \item \textsl{You are missing out on <topic>}.
+    \item \textsl{Continue your streak on <topic>}.
+    \item \textsl{Have you studied <topic> today?}
+    \item \textsl{<Random question about one topic>}.
+\end{itemize}
+\subsection{Feedback}
+\subsubsection{Reward}
+\subsubsection{List of Feedbacks}
+\begin{itemize}
+    \item \textsl{Level Up!} (positive).
+    \item \textsl{Level Down...} (negative).
+    \item \textsl{Nice streak! Keep it up!} (positive).
+    \item \textsl{You missed a few in a row, take your time to answer...} (negative).
+    \item \textsl{You're nailing it! Just a few more to go!} (positive)
+    \item \textsl{Don't give up, just a few more to go!} (negative)
+\end{itemize}
+\subsection{Test Layout}
+Each test consists on a number $N$ of questions of progressing difficulties. Consecutive right and wrong answers lead to going up or down levels of difficulty, respectively.
+After each question, the ITS computes the feedback with highest reward and provides it. The 
+
+\section{Programming}
+Since SIACUA is programmed in C$\sharp$, the ITS will also be constructed in that language, as a Class Library (.dll file), to be then used as a reference for this and other web applications.
+
 \end{document}
