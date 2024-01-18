@@ -1,0 +1,48 @@
+\begin{thebibliography}{1}
+
+\bibitem{bandit2014}
+Benjamin Clement, Didier Roy, Pierre-Yves Oudeyer, and Manuel Lopes.
+\newblock Online optimization of teaching sequences with multi-armed bandits.
+\newblock In {\em Proceedings of the 7th International Conference on
+  Educational Data Mining}, 2014.
+
+\bibitem{siacua}
+Luís Descalço and Paula Carvalho.
+\newblock Siacua.
+\newblock https://siacua.web.ua.pt.
+\newblock Accessed: 2023-11-22.
+
+\bibitem{fuzzy2020}
+Meltem Eryılmaz and Afaf Adabashi.
+\newblock Development of an intelligent tutoring system using bayesian networks
+  and fuzzy logic for a higher student academic performance.
+\newblock {\em Applied Sciences}, 10(19), 2020.
+
+\bibitem{gamboa2001}
+Hugo Gamboa and Ana L.~N. Fred.
+\newblock Designing intelligent tutoring systems: A bayesian approach.
+\newblock In {\em International Conference on Enterprise Information Systems},
+  2001.
+
+\bibitem{noriega2017}
+Alan Ramírez-Noriega, Reyes Juárez-Ramírez, and Yobani Martínez-Ramírez.
+\newblock Evaluation module based on bayesian networks to intelligent tutoring
+  systems.
+\newblock {\em International Journal of Information Management}, 37(1, Part
+  A):1488--1498, 2017.
+
+\bibitem{duolingo2015}
+Matthew Streeter.
+\newblock Mixture modeling of individual learning curves.
+\newblock In {\em Proceedings of the 8th International Conference on
+  Educational Data Mining}, 2015.
+
+\bibitem{duolingo2020}
+Kevin~P. Yancey and Burr Settles.
+\newblock A sleeping, recovering bandit algorithm for optimizing recurring
+  notifications.
+\newblock In {\em Proceedings of the 26th ACM SIGKDD International Conference
+  on Knowledge Discovery \& Data Mining}, KDD '20, pages 3008--3016, New York,
+  NY, USA, 2020. Association for Computing Machinery.
+
+\end{thebibliography}
